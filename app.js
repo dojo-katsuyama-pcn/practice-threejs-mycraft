@@ -11,10 +11,18 @@ const sizeWindow = {
 }
 const vec2mouse = new THREE.Vector2();
 
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-const cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
+
+
+for(let i=0; i<100; i++){
+    const geometry = new THREE.BoxGeometry(10,10,10);
+    const material = new THREE.MeshBasicMaterial( { color: 0x005500 } );
+    const cube = new THREE.Mesh( geometry, material );
+    cube.position.x = 5 + (i-50)*10;
+    cube.position.y = -5;
+    cube.position.z = 5;
+    scene.add( cube );
+}
+
 
 camera.position.x = 0;
 camera.position.y = 10;
@@ -46,6 +54,7 @@ let dSide = 0.0;
 
 let dv = -99;
 
+let aim = undefined;
 
 function animate() {
 
@@ -73,17 +82,34 @@ function animate() {
     raycaster.setFromCamera(vec2mouse, camera);
     const intersects = raycaster.intersectObjects(scene.children);
 
+    let near = undefined;
     if(intersects.length > 0){
-        //console.log(intersects);
         for(let item of intersects) {
-            console.log(item.distance)
-            if (item.object === grid) {
-                // console.log("same");
-            } else {
-                // console.log("nosame");
-            }
+            if(item.object === grid) continue;
+
+            if(!near) {
+                near = item;
+            } else if(near.distance < item.distance) {
+                near = item;
+            }            
+            //console.log(item.distance)
+            // if (item.object === grid) {
+            //     // console.log("same");
+            // } else {
+            //     // console.log("nosame");
+            // }
         }
     }
+
+    if(near) {
+        aim = new THREE.Vector3(near.point.x, near.point.y, near.point.z);
+        console.log(near);
+    } else {
+        aim = undefined;
+    }
+
+
+
 
     renderer.render( scene, camera );
 }
