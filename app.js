@@ -62,12 +62,27 @@ function animate() {
 
     requestAnimationFrame( animate );
 
-    camera.rotation.y += dRotateY;
+    //// ver1 ->
+    //camera.rotation.y += dRotateY;
+    //// <- ver1
     
+
+
+    // let vec = new THREE.Vector3(1, 0, 0);
+    // vec.applyQuaternion( camera.quaternion );
+
+
+    // TODO totation.yでみるとQuaternionがうまく計算して値が前後方向同じになる
+//    console.log(camera.rotation.y);
+    //////console.log(camera.quaternion.angleTo(new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), 0)));
+
+    // camera.position.x += dFront * vec.x;
+    // camera.position.z += dFront * vec.x;
+
     camera.position.x += dFront * Math.sin(camera.rotation.y);
     camera.position.z += dFront * Math.cos(camera.rotation.y);
 
-    camera.position.x += dSide * Math.cos(camera.rotation.y);
+    camera.position.x -= dSide * Math.cos(camera.rotation.y);
     camera.position.z -= dSide * Math.sin(camera.rotation.y);
 
     if(dv > -99) {
@@ -103,7 +118,7 @@ function animate() {
 
     if(near) {
         aim = new THREE.Vector3(near.point.x, near.point.y, near.point.z);
-        console.log(near);
+        //console.log(near);
     } else {
         aim = undefined;
     }
@@ -139,32 +154,53 @@ document.body.addEventListener('keyup', event => {
     } else if (event.key === 'd') {
         dSide = 0;
     }
+
+
 });
 
 document.body.addEventListener('mousemove', e => {
-    if (sizeWindow.width/3 > e.pageX) {
-        dRotateY = 0.02;
-    } else if (sizeWindow.width/3*2 < e.pageX) {
-        dRotateY = -0.02;
-    } else {
-        dRotateY = 0.0;
-    }
 
-    if (sizeWindow.height/3 > e.pageY) {
-        dRotateX = 0.02;
-    } else if (sizeWindow.height/3*2 < e.pageY) {
-        dRotateX = -0.02;
-    } else {
-        dRotateX = 0.0;
-    }
+    dRotateY -= e.movementX/200.0;
+    dRotateX -= e.movementY/200.0;
+    if(-0.6 > dRotateX) dRotateX = -0.6;
+    if(0.6 < dRotateX) dRotateX = 0.6;
+
+    const dq = new THREE.Quaternion()
+        .multiply(new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), dRotateY))
+        .multiply(new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), dRotateX));
+    camera.rotation.setFromQuaternion(dq);
+
+    ///// ver2 ->
+    //camera.rotation.y -= e.movementX/200.0;
+    //camera.rotation.x -= e.movementY/200.0;
+    ///// <- ver2
+
+    ///// ver1 ->
+    // if (sizeWindow.width/3 > e.pageX) {
+    //     dRotateY = 0.02;
+    // } else if (sizeWindow.width/3*2 < e.pageX) {
+    //     dRotateY = -0.02;
+    // } else {
+    //     dRotateY = 0.0;
+    // }
+    // if (sizeWindow.height/3 > e.pageY) {
+    //     dRotateX = 0.02;
+    // } else if (sizeWindow.height/3*2 < e.pageY) {
+    //     dRotateX = -0.02;
+    // } else {
+    //     dRotateX = 0.0;
+    // }
+    ///// <- ver1
 
     vec2mouse.x = ( e.pageX / sizeWindow.width ) * 2 - 1;
     vec2mouse.y = -( e.pageY / sizeWindow.height ) * 2 + 1;
 });
 
 document.body.addEventListener('mouseout', e => {
-    dRotateY = 0.0;
-    dRotateX = 0.0;
+    ///// ver1 ->
+    // dRotateY = 0.0;
+    // dRotateX = 0.0;
+    ///// <- ver1
 });
 
 
