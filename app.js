@@ -1,5 +1,7 @@
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -11,6 +13,9 @@ const sizeWindow = {
 }
 const vec2mouse = new THREE.Vector2();
 
+
+const camera_base = new THREE.Object3D();
+scene.add( camera_base );
 
 
 for(let i=0; i<100; i++){
@@ -66,7 +71,7 @@ function animate() {
     //camera.rotation.y += dRotateY;
     //// <- ver1
     
-
+    //console.log(camera.rotation.toVector3().y, camera.rotation.y);
 
     // let vec = new THREE.Vector3(1, 0, 0);
     // vec.applyQuaternion( camera.quaternion );
@@ -79,11 +84,19 @@ function animate() {
     // camera.position.x += dFront * vec.x;
     // camera.position.z += dFront * vec.x;
 
-    camera.position.x += dFront * Math.sin(camera.rotation.y);
-    camera.position.z += dFront * Math.cos(camera.rotation.y);
+//    console.log(camera.rotation.toVector3().z);
 
-    camera.position.x -= dSide * Math.cos(camera.rotation.y);
-    camera.position.z -= dSide * Math.sin(camera.rotation.y);
+    //console.log(camera.rotation.x + "," + camera.rotation.y +"," + Math.cos(camera.rotation.y));
+
+    // const vecy = new THREE.Vector3(0,1,0);
+    // const vecn = new THREE.Vector3(camera.rotation.toVector3().x,camera.rotation.toVector3().y,0);
+    // console.log(vecn.angleTo(vecy));
+    
+    camera.position.x += dFront * Math.sin(dRotateY);
+    camera.position.z += dFront * Math.cos(dRotateY);
+
+    camera.position.x += dSide * Math.cos(dRotateY);
+    camera.position.z -= dSide * Math.sin(dRotateY);
 
     if(dv > -99) {
         camera.position.y += dv;
@@ -153,15 +166,16 @@ document.body.addEventListener('keyup', event => {
         dSide = 0;
     } else if (event.key === 'd') {
         dSide = 0;
+    } else if (event.key === "Escape") {
+        document.exitPointerLock();
     }
-
-
 });
 
 document.body.addEventListener('mousemove', e => {
 
-    dRotateY -= e.movementX/200.0;
-    dRotateX -= e.movementY/200.0;
+    dRotateY -= e.movementX * (Math.PI / 180.0) / 10;
+    dRotateX -= e.movementY * (Math.PI / 180.0) / 10;
+    console.log(Math.PI / 2 + "," + dRotateY + "," + camera.rotation.y);
     if(-0.6 > dRotateX) dRotateX = -0.6;
     if(0.6 < dRotateX) dRotateX = 0.6;
 
@@ -206,9 +220,7 @@ document.body.addEventListener('mouseout', e => {
 
 document.body.addEventListener('click', e => {
     console.log("click");
-
-
-
+    canvas.requestPointerLock();
 });
 
 
